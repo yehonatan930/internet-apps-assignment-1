@@ -21,7 +21,7 @@ mongoose
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 // Use the postsController router for the '/api/posts' route
-app.use("/api/posts", postsController);
+app.use("/post", postsController);
 
 // Start the server
 app.listen(PORT, () => {
