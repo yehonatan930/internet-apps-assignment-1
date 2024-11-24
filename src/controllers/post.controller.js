@@ -5,6 +5,19 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
+app.get('/posts', async (req, res) => {
+  const { sender } = req.query;
+  if (!sender) {
+    return res.status(400).json({ error: 'Sender ID is required' });
+  }
+
+  try {
+    const posts = await Post.find({ sender });
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.put("/", async (req, res) => {
   try {
