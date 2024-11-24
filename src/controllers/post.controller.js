@@ -5,6 +5,7 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
+
 router.put("/", async (req, res) => {
   try {
     const updatedPost = await Post.findByIdAndUpdate(req.body.id, req.body, {
@@ -19,5 +20,19 @@ router.put("/", async (req, res) => {
       .status(400)
       .json({ message: "Error updating post", error: err.message });
   }
+}); 
+
+// Create a new post
+router.post("/", async (req, res) => {
+  try {
+    const newPost = new Post(req.body);
+    const savedPost = await newPost.save();
+    res.status(201).json(savedPost);
+  } catch (err) {
+    res
+      .status(400)
+      .json({ message: "Error creating post", error: err.message });
+  }
 });
+
 module.exports = router;
