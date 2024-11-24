@@ -5,6 +5,19 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
+// Get a Post by ID
+app.get('/post/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.put("/", async (req, res) => {
   try {
