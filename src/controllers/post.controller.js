@@ -5,6 +5,14 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
+router.get('/posts', async (req, res) => {
+  try {
+    const posts = await Post.find();
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.put("/", async (req, res) => {
   try {
