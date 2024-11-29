@@ -5,7 +5,8 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
-app.get("/posts", async (req, res) => {
+// get all posts
+router.get("/", async (req, res) => {
   const { sender } = req.query;
   if (!sender) {
     try {
@@ -25,7 +26,7 @@ app.get("/posts", async (req, res) => {
 });
 
 // Get a Post by ID
-app.get("/post/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const post = await Post.findById(id);
@@ -38,6 +39,7 @@ app.get("/post/:id", async (req, res) => {
   }
 });
 
+// update a Post
 router.put("/", async (req, res) => {
   try {
     const updatedPost = await Post.findByIdAndUpdate(req.body.id, req.body, {
