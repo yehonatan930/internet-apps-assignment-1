@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { postSchema } = require("../schemas/post.schema");
+const { commentSchema } = require("../schemas/comment.schema");
 const router = express.Router();
 
 const Comment = mongoose.model("Comment", commentSchema);
 
 // Delete a Comment
-app.delete("/comments/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -23,7 +23,7 @@ app.delete("/comments/:id", async (req, res) => {
 });
 
 // Update a Comment
-app.put("/comments/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { content, author } = req.body;
 
@@ -49,7 +49,7 @@ app.put("/comments/:id", async (req, res) => {
 });
 
 // Get All Comments
-app.get("/comments", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const comments = await Comment.find();
     res.status(200).json(comments);
@@ -59,7 +59,7 @@ app.get("/comments", async (req, res) => {
 });
 
 // Add a New Comment
-app.post("/comments", async (req, res) => {
+router.post("/", async (req, res) => {
   const { postId, content, author } = req.body;
 
   if (!postId || !content) {
@@ -74,3 +74,5 @@ app.post("/comments", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+module.exports = router;
