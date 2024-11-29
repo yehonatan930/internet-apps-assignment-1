@@ -8,14 +8,19 @@ const Post = mongoose.model("Post", postSchema);
 app.get("/posts", async (req, res) => {
   const { sender } = req.query;
   if (!sender) {
-    return res.status(400).json({ error: "Sender ID is required" });
-  }
-
-  try {
-    const posts = await Post.find({ sender });
-    res.status(200).json(posts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    try {
+      const posts = await Post.find();
+      res.status(200).json(posts);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  } else {
+    try {
+      const posts = await Post.find({ sender });
+      res.status(200).json(posts);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
@@ -28,15 +33,6 @@ app.get("/post/:id", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
     res.status(200).json(post);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/posts", async (req, res) => {
-  try {
-    const posts = await Post.find();
-    res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
