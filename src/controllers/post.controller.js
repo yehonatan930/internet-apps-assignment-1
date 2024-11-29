@@ -5,14 +5,37 @@ const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
 
-app.get('/posts', async (req, res) => {
+app.get("/posts", async (req, res) => {
   const { sender } = req.query;
   if (!sender) {
-    return res.status(400).json({ error: 'Sender ID is required' });
+    return res.status(400).json({ error: "Sender ID is required" });
   }
 
   try {
     const posts = await Post.find({ sender });
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get a Post by ID
+app.get("/post/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/posts", async (req, res) => {
+  try {
+    const posts = await Post.find();
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -33,7 +56,7 @@ router.put("/", async (req, res) => {
       .status(400)
       .json({ message: "Error updating post", error: err.message });
   }
-}); 
+});
 
 // Create a new post
 router.post("/", async (req, res) => {
