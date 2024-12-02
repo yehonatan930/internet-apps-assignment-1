@@ -3,6 +3,7 @@ POST http://localhost:8080/comments HTTP/1.1
 Content-Type: application/json
 
 {
+  "_id": 1,
   "postId": 1,
   "content": "This is my first comment.",
   "author": "JohnDoe"
@@ -15,8 +16,22 @@ POST http://localhost:8080/comments HTTP/1.1
 Content-Type: application/json
 
 {
+  "_id": 2,
   "postId": 1,
   "content": "This is another comment for the same post.",
+  "author": "JaneDoe"
+}
+
+###
+
+### Add another comment
+POST http://localhost:8080/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "_id": 3,
+  "postId": 2,
+  "content": "This is another comment for the another post.",
   "author": "JaneDoe"
 }
 

@@ -58,16 +58,21 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get All Comments
+router.get("/:postId", async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const comments = await Comment.find({ postId });
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Add a New Comment
 router.post("/", async (req, res) => {
-  const { postId, content, author } = req.body;
-
-  if (!postId || !content) {
-    return res.status(400).json({ error: "postId and content are required" });
-  }
-
   try {
-    const comment = new Comment({ postId, content, author });
+    const comment = new Comment(req.body);
     await comment.save();
     res.status(201).json(comment);
   } catch (error) {

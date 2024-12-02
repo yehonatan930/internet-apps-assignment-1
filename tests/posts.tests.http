@@ -29,7 +29,7 @@ Content-Type: application/json
 ###
 
 ### Update an existing post
-PUT http://localhost:3000/posts HTTP/1.1
+PUT http://localhost:8080/posts HTTP/1.1
 Content-Type: application/json
 
 {
@@ -46,12 +46,6 @@ Content-Type: application/json
 ###
 
 ### Get a post by ID
-GET http://localhost:8080/posts/1 HTTP/1.1
-Content-Type: application/json
-
-###
-
-### Get the updated post by ID
 GET http://localhost:8080/posts/1 HTTP/1.1
 Content-Type: application/json
 
