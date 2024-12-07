@@ -8,8 +8,8 @@ export const userSchema = new mongoose.Schema({
 })
 
 export interface User {
-    id: string;
+    id: string; // Unique identifier
     username: string;
     email: string;
-    password: string;
+    password: string; // hashed password
 }
