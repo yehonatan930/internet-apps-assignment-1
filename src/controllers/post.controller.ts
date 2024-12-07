@@ -1,6 +1,6 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const { postSchema } = require("../schemas/post.schema");
+import express from 'express';
+import mongoose from 'mongoose';
+import { postSchema } from '../schemas/post.schema';
 const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
@@ -12,14 +12,14 @@ router.get("/", async (req, res) => {
     try {
       const posts = await Post.find();
       res.status(200).json(posts);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   } else {
     try {
       const posts = await Post.find({ sender });
       res.status(200).json(posts);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   }
@@ -34,7 +34,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
     res.status(200).json(post);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -69,4 +69,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
