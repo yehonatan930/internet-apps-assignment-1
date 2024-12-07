@@ -1,8 +1,8 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const postsController = require("./controllers/post.controller");
-const commentsController = require("./controllers/comment.controller");
+import express from 'express';
+import mongoose, {Mongoose} from 'mongoose';
+import dotenv from 'dotenv';
+import postsController from './controllers/post.controller';
+import commentsController from './controllers/comment.controller';
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ const PORT = process.env.PORT;
 
 // MongoDB Connection
 mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true } as mongoose.ConnectOptions)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 

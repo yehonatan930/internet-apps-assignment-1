@@ -1,6 +1,6 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const { commentSchema } = require("../schemas/comment.schema");
+import express from 'express';
+import mongoose, {Error} from 'mongoose';
+import { commentSchema } from '../schemas/comment.schema';
 const router = express.Router();
 
 const Comment = mongoose.model("Comment", commentSchema);
@@ -17,7 +17,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     res.status(200).json({ message: "Comment deleted successfully" });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -43,7 +43,7 @@ router.put("/:id", async (req, res) => {
     }
 
     res.status(200).json(updatedComment);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
   try {
     const comments = await Comment.find();
     res.status(200).json(comments);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -64,7 +64,7 @@ router.get("/:postId", async (req, res) => {
   try {
     const comments = await Comment.find({ postId });
     res.status(200).json(comments);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
@@ -75,9 +75,9 @@ router.post("/", async (req, res) => {
     const comment = new Comment(req.body);
     await comment.save();
     res.status(201).json(comment);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 });
 
-module.exports = router;
+export default router;
