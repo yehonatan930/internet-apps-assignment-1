@@ -6,7 +6,7 @@ import commentsController from './controllers/comment.controller';
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 
 // Middleware to parse JSON
 app.use(express.json());
