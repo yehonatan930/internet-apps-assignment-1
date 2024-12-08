@@ -1,4 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+
+export interface IPost {
+  _id: number;
+  title: string;
+  content: string;
+  sender: string;
+}
 
 export const postSchema = new mongoose.Schema({
   _id: { type: Number, required: true },

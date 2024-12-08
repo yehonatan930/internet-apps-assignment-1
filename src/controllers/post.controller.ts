@@ -1,6 +1,6 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import { postSchema } from '../schemas/post.schema';
+import express from "express";
+import mongoose from "mongoose";
+import { IPost, postSchema } from "../schemas/post.schema";
 const router = express.Router();
 
 const Post = mongoose.model("Post", postSchema);
@@ -10,14 +10,14 @@ router.get("/", async (req, res) => {
   const { sender } = req.query;
   if (!sender) {
     try {
-      const posts = await Post.find();
+      const posts: IPost[] = await Post.find();
       res.status(200).json(posts);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   } else {
     try {
-      const posts = await Post.find({ sender });
+      const posts: IPost[] = await Post.find({ sender });
       res.status(200).json(posts);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const post = await Post.findById(id);
+    const post: IPost = await Post.findById(id);
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -42,10 +42,14 @@ router.get("/:id", async (req, res) => {
 // update a Post
 router.put("/", async (req, res) => {
   try {
-    const updatedPost = await Post.findByIdAndUpdate(req.body.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedPost: IPost = await Post.findByIdAndUpdate(
+      req.body.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     if (!updatedPost)
       return res.status(404).json({ message: "Post not found" });
     res.json(updatedPost);
