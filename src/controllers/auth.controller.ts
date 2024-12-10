@@ -43,7 +43,9 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 
   try {
-    const user: IUser = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+    });
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
@@ -56,15 +58,115 @@ router.post("/login", async (req: Request, res: Response) => {
     const accessToken: string = jwt.sign(
       { email: user.email, _id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRY }
+      { expiresIn: "1h" }
     );
 
-    res.status(200).json({ accessToken });
+    const refreshToken: string = jwt.sign(
+      { email: user.email, _id: user._id },
+      process.env.REFRESH_SECRET
+    );
+
+    if (!user.tokens) {
+      user.tokens = [refreshToken];
+    } else {
+      user.tokens.push(refreshToken);
+    }
+
+    await user.save();
+
+    res.status(200).json({ accessToken, refreshToken });
   } catch {
     res.status(500).json({ message: "Error logging in user" });
   }
 });
 
-router.post("/logout", (req: Request, res: Response) => {});
+router.post("/refresh", async (req: Request, res: Response) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    jwt.verify(
+      token,
+      process.env.REFRESH_SECRET,
+      async (err: jwt.VerifyErrors, userInfo: jwt.JwtPayload) => {
+        if (err) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+
+        const userId = userInfo._id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.tokens.includes(token)) {
+          user.tokens = [];
+          await user.save();
+          return res.status(403).json({ message: "Forbidden" });
+        }
+
+        const accessToken: string = jwt.sign(
+          { email: user.email, _id: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+
+        const refreshToken = jwt.sign(
+          { email: user.email, _id: user._id },
+          process.env.REFRESH_SECRET
+        );
+
+        user.tokens[user.tokens.indexOf(token)] = refreshToken;
+        await user.save();
+        res.status(200).json({ accessToken, refreshToken });
+      }
+    );
+  } catch {
+    res.status(500).json({ message: "Error refreshing token" });
+  }
+});
+
+router.post("/logout", (req: Request, res: Response) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    jwt.verify(
+      token,
+      process.env.REFRESH_SECRET,
+      async (err: jwt.VerifyErrors, userInfo: jwt.JwtPayload) => {
+        if (err) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+
+        const userId = userInfo._id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.tokens.includes(token)) {
+          user.tokens = [];
+          await user.save();
+          return res.status(403).json({ message: "Forbidden" });
+        }
+
+        user.tokens = user.tokens.splice(user.tokens.indexOf(token), 1);
+        await user.save();
+        res.status(200).json({ message: "User logged out successfully" });
+      }
+    );
+  } catch {
+    res.status(500).json({ message: "Error logging out user" });
+  }
+});
 
 export default router;
