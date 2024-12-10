@@ -7,7 +7,7 @@ export interface IComment {
   author: string;
 }
 
-export const commentSchema = new mongoose.Schema({
+export const commentSchema = new mongoose.Schema<IComment>({
   _id: { type: Number, required: true },
   postId: { type: Number, ref: "Post", required: true },
   content: { type: String, required: true },

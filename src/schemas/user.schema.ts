@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const userSchema = new mongoose.Schema({
+export const userSchema = new mongoose.Schema<IUser>({
   _id: { type: String, required: true },
   username: { type: String, required: true },
   email: { type: String, required: true },
