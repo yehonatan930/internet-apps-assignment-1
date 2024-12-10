@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "src/@types"],
     "target": "ES6",
     "module": "CommonJS",
     "esModuleInterop": true,
@@ -9,6 +10,6 @@
     "useUnknownInCatchVariables": false,
     "strictNullChecks": false
   },
-  "include": ["src/**/*", "tests/**/*", "types.d.ts"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }

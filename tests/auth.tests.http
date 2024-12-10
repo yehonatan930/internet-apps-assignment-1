@@ -1,0 +1,19 @@
+### register
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "password123",
+    "email": "test@gmail.com"
+
+}
+
+### Log In
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "password": "password123",
+    "email": "test@gmail.com"
+}
