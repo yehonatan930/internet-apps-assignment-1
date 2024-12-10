@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
+  if (req.path === "/auth/login" || req.path === "/auth/register") {
+    return next();
+  }
+
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 

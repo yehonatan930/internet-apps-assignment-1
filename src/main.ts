@@ -1,8 +1,9 @@
-import express from 'express';
-import mongoose, {Mongoose} from 'mongoose';
-import dotenv from 'dotenv';
-import postsController from './controllers/post.controller';
-import commentsController from './controllers/comment.controller';
+import express from "express";
+import mongoose, { Mongoose } from "mongoose";
+import dotenv from "dotenv";
+import postsController from "./controllers/post.controller";
+import commentsController from "./controllers/comment.controller";
+import authenticate from "./middlewares/auth.middleware";
 
 dotenv.config();
 
@@ -11,16 +12,18 @@ const app = express();
 // Middleware to parse JSON
 app.use(express.json());
 
-// Environment variables
 const mongoURI = process.env.MONGO_URI;
 const PORT = process.env.PORT;
 
-// MongoDB Connection
 mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true } as mongoose.ConnectOptions)
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  } as mongoose.ConnectOptions)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
+app.use(authenticate);
 // Use the postsController router for the '/api/posts' route
 app.use("/posts", postsController);
 app.use("/comments", commentsController);
