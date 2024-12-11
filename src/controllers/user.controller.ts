@@ -7,57 +7,6 @@ const router = express.Router();
 
 const User = mongoose.model("User", userSchema);
 
-router.post("/register", async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
-  const users: IUser[] = await User.find({ email });
-
-  // Check if user exists
-  if (users.length) {
-    return res.status(400).json({ message: "User already exists" });
-  }
-
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({
-    _id: uuidv4(),
-    username,
-    email,
-    password: hashedPassword,
-  });
-
-  newUser.save();
-  res.status(201).json({ message: "User registered successfully" });
-});
-
-router.post("/login", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const user: IUser = await User.findOne({ email });
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  // Compare passwords
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  // Generate tokens
-  // const accessToken = jwt.sign({ id: user.id, email: user.email }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-  // const refreshToken = jwt.sign({ id: user.id }, REFRESH_TOKEN_SECRET);
-  //
-  // refreshTokens.push(refreshToken);
-  // res.status(200).json({ accessToken, refreshToken });
-});
-
-router.post("/logout", (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
-
-  // refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-  res.status(200).json({ message: "User logged out" });
-});
-
 router.get("/users", async (req: Request, res: Response) => {
   const users: IUser[] = await User.find({});
 
@@ -73,6 +22,33 @@ router.get("/users/:id", async (req: Request, res: Response) => {
   }
 
   res.status(200).json(user);
+});
+
+router.post("/users", async (req: Request, res: Response) => {
+  const { username, email, password } = req.body;
+
+  try {
+    const user: IUser = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const encryptedPassword = await bcrypt.hash(password, salt);
+    const newUser = new User({
+      _id: uuidv4(),
+      username,
+      email,
+      password: encryptedPassword,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ message: "User created successfully" });
+  } catch {
+    res.status(500).json({ message: "Error registering user" });
+  }
 });
 
 router.put("/users/:id", async (req: Request, res: Response) => {
