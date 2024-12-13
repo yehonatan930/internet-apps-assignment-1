@@ -5,6 +5,7 @@ import postsController from "./controllers/post.controller";
 import commentsController from "./controllers/comment.controller";
 import authenticate from "./middlewares/auth.middleware";
 import authController from "./controllers/auth.controller";
+import usersController from "./controllers/user.controller";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(authenticate);
 app.use("/auth", authController);
 app.use("/posts", postsController);
 app.use("/comments", commentsController);
+app.use("/users", usersController);
 
 // Start the server
 app.listen(PORT, () => {
