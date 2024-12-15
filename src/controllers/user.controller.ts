@@ -1,113 +1,71 @@
-import express, {Request, Response} from 'express';
-import bcrypt from 'bcrypt';
-import {v4 as uuidv4} from 'uuid';
+import express, { Request, Response } from "express";
 import mongoose from "mongoose";
-import {User, userSchema} from "../schemas/user.schema"; // For generating unique u
+import { IUser, userSchema } from "../schemas/user.schema"; // For generating unique u
 const router = express.Router();
 
 const User = mongoose.model("User", userSchema);
 
-router.post('/register', async (req: Request, res: Response) => {
-    const {username, email, password} = req.body;
-    const users: User[] = await User.find({});
-
-    // Check if user exists
-    if (users.find(user => user.email === email)) {
-        return res.status(400).json({message: 'User already exists'});
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = {
-        id: uuidv4(),
-        username,
-        email,
-        password: hashedPassword
-    };
-
-    users.push(newUser);
-    res.status(201).json({message: 'User registered successfully'});
-});
-
-router.post('/login', async (req: Request, res: Response) => {
-    const {email, password} = req.body;
-    const users: User[] = await User.find({});
-
-    const user = users.find(u => u.email === email);
-    if (!user) {
-        return res.status(404).json({message: 'User not found'});
-    }
-
-    // Compare passwords
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-        return res.status(401).json({message: 'Invalid credentials'});
-    }
-
-    // Generate tokens
-    // const accessToken = jwt.sign({ id: user.id, email: user.email }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-    // const refreshToken = jwt.sign({ id: user.id }, REFRESH_TOKEN_SECRET);
-    //
-    // refreshTokens.push(refreshToken);
-    // res.status(200).json({ accessToken, refreshToken });
-});
-
-router.post('/logout', (req: Request, res: Response) => {
-    const {refreshToken} = req.body;
-
-    // refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-    res.status(200).json({message: 'User logged out'});
-});
-
-router.get('/users', async (req: Request, res: Response) => {
-    const users: User[] = await User.find({});
-
+// GET: Fetch all users
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    const users = await User.find();
     res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users", error });
+  }
 });
 
-router.get('/users/:id', async (req: Request, res: Response) => {
-    const users: User[] = await User.find({});
-
-    const user = users.find(u => u.id === req.params.id);
-
-    if (!user) {
-        return res.status(404).json({message: 'User not found'});
-    }
-
+// GET: Fetch a single user by ID
+router.get("/:id", async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user", error });
+  }
 });
 
-router.put('/users/:id', async (req: Request, res: Response) => {
-    const {id} = req.params;
-    const {username, email, password} = req.body;
-    const users: User[] = await User.find({});
-
-    const userIndex = users.findIndex(u => u.id === id);
-    if (userIndex === -1) {
-        return res.status(404).json({message: 'User not found'});
+// POST: Create a new user
+router.post("/", async (req: Request, res: Response) => {
+  try {
+    const { _id, username, email, password, tokens } = req.body;
+    if (!_id || !username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-
-    const updatedUser = {
-        ...users[userIndex],
-        username: username || users[userIndex].username,
-        email: email || users[userIndex].email,
-        password: password ? bcrypt.hashSync(password, 10) : users[userIndex].password,
-        updatedAt: new Date(),
-    };
-
-    users[userIndex] = updatedUser;
-    res.status(200).json({message: 'User updated successfully', user: updatedUser});
+    const newUser = new User({ _id, username, email, password, tokens });
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating user", error });
+  }
 });
 
-router.delete('/users/:id', async (req: Request, res: Response) => {
-    const {id} = req.params;
-    const users: User[] = await User.find({});
-
-    const userIndex = users.findIndex(u => u.id === id);
-    if (userIndex === -1) {
-        return res.status(404).json({message: 'User not found'});
-    }
-
-    users.splice(userIndex, 1);
-    res.status(200).json({message: 'User deleted successfully'});
+// PUT: Update an existing user
+router.put("/:id", async (req: Request, res: Response) => {
+  try {
+    const { username, email, password, tokens } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { username, email, password, tokens },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
 });
+
+// DELETE: Remove a user
+router.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+});
+
+export default router;
