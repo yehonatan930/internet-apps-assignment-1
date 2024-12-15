@@ -10,6 +10,6 @@
     "useUnknownInCatchVariables": false,
     "strictNullChecks": false
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -9,7 +9,7 @@ import usersController from "./controllers/user.controller";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 
 // Middleware to parse JSON
 app.use(express.json());
